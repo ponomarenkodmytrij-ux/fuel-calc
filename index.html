@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Калькулятор палива</title>
+    <style>
+        :root {
+            --accent: #2f80ed;
+            --label: #2f80ed;
+            --bg: var(--tg-theme-bg-color, #ffffff);
+            --card: var(--tg-theme-secondary-bg-color, #f4f5f7);
+            --text: var(--tg-theme-text-color, #1a1a1a);
+            --border: #d9dde3;
+            --hint: var(--tg-theme-hint-color, #8a94a6);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 16px;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .tab {
+            display: inline-block;
+            background: #2b2f36;
+            color: #fff;
+            font-weight: 600;
+            font-size: 15px;
+            padding: 12px 28px;
+            border-radius: 24px;
+            margin-bottom: 24px;
+        }
+
+        .section-title {
+            color: var(--label);
+            font-weight: 700;
+            font-size: 13px;
+            letter-spacing: .3px;
+            text-transform: uppercase;
+            margin: 0 0 16px;
+        }
+
+        .field {
+            margin-bottom: 20px;
+        }
+
+        .field label {
+            display: block;
+            color: var(--label);
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            margin-bottom: 8px;
+        }
+
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .row .value {
+            flex: 1;
+        }
+
+        .row .unit {
+            flex: 1.1;
+        }
+
+        input, select {
+            width: 100%;
+            height: 52px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            background: #fff;
+            font-size: 20px;
+            color: var(--text);
+            padding: 0 14px;
+            outline: none;
+            transition: border-color .15s;
+        }
+
+        input {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        input:focus, select:focus {
+            border-color: var(--accent);
+        }
+
+        select {
+            font-size: 15px;
+            font-weight: 500;
+            color: #4a5568;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a94a6' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+
+        /* поле результату — виділене сірим, лише для читання */
+        .result-field input {
+            background: #e7eaf0;
+            font-weight: 700;
+            color: #1a1a1a;
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0 20px;
+        }
+
+        .total {
+            background: var(--card);
+            border-radius: 12px;
+            padding: 18px;
+            margin-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total .lbl {
+            color: var(--label);
+            font-weight: 700;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .total .amount {
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .hint {
+            color: var(--hint);
+            font-size: 12px;
+            line-height: 1.5;
+            margin-top: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="tab">Вартість подорожі</div>
+
+    <p class="section-title">Первинні дані</p>
+
+    <div class="field">
+        <label>Відстань</label>
+        <div class="row">
+            <div class="value">
+                <input type="number" id="distance" inputmode="decimal" value="1200" placeholder="0">
+            </div>
+            <div class="unit">
+                <select id="distUnit">
+                    <option value="1">кілометр</option>
+                    <option value="1.60934">миля</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="field">
+        <label>Ср. витрата палива</label>
+        <div class="row">
+            <div class="value">
+                <input type="number" id="consumption" inputmode="decimal" value="5.7" placeholder="0">
+            </div>
+            <div class="unit">
+                <select id="consUnit">
+                    <option value="per100">літрів / 100 км</option>
+                    <option value="kmpl">км / літр</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="field result-field">
+        <label>Необхідна кількість палива</label>
+        <div class="row">
+            <div class="value">
+                <input type="text" id="liters" readonly value="0">
+            </div>
+            <div class="unit">
+                <select disabled>
+                    <option>літри (L)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <div class="field">
+        <label>Вартість палива</label>
+        <div class="row">
+            <div class="value">
+                <input type="number" id="price" inputmode="decimal" value="1.30" placeholder="0">
+            </div>
+            <div class="unit">
+                <select disabled>
+                    <option>/ літри (L)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="total">
+        <span class="lbl">Загальна вартість</span>
+        <span class="amount" id="totalCost">0.00</span>
+    </div>
+
+    <p class="hint">
+        Поточні місцеві ціни на паливо недоступні для цієї сторінки.
+        Введіть ціну на паливо вручну.
+    </p>
+
+    <script>
+        const tg = window.Telegram?.WebApp;
+        if (tg) { tg.ready(); tg.expand(); }
+
+        const $ = id => document.getElementById(id);
+        const inputs = ['distance', 'consumption', 'price', 'distUnit', 'consUnit'];
+
+        function calculate() {
+            const dist = parseFloat($('distance').value) || 0;
+            const distKm = dist * parseFloat($('distUnit').value); // → км
+
+            let consPer100;
+            const cons = parseFloat($('consumption').value) || 0;
+            if ($('consUnit').value === 'kmpl') {
+                // км/л → л/100км
+                consPer100 = cons > 0 ? 100 / cons : 0;
+            } else {
+                consPer100 = cons;
+            }
+
+            const price = parseFloat($('price').value) || 0;
+
+            const liters = distKm * consPer100 / 100;
+            const cost = liters * price;
+
+            $('liters').value = liters.toFixed(2);
+            $('totalCost').textContent = cost.toFixed(2);
+        }
+
+        inputs.forEach(id => {
+            $(id).addEventListener('input', calculate);
+            $(id).addEventListener('change', calculate);
+        });
+
+        calculate(); // початковий розрахунок
+    </script>
+</body>
+</html>
