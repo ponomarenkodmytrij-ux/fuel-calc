@@ -7,187 +7,181 @@
     <title>Калькулятор палива</title>
     <style>
         :root {
-            --accent: var(--tg-theme-link-color, #2f80ed);
-            --label: var(--tg-theme-link-color, #2f80ed);
+            --accent: var(--tg-theme-button-color, #2f80ed);
+            --accent-text: var(--tg-theme-button-text-color, #ffffff);
+            --link: var(--tg-theme-link-color, #2f80ed);
             --bg: var(--tg-theme-bg-color, #ffffff);
-            --card: var(--tg-theme-secondary-bg-color, #f4f5f7);
-            --text: var(--tg-theme-text-color, #1a1a1a);
-            --hint: var(--tg-theme-hint-color, #8a94a6);
-            --field-bg: var(--tg-theme-bg-color, #ffffff);
-            --border: color-mix(in srgb, var(--text) 15%, transparent);
+            --page: var(--tg-theme-secondary-bg-color, #eef1f6);
+            --text: var(--tg-theme-text-color, #16181d);
+            --hint: var(--tg-theme-hint-color, #9099a8);
+            --border: color-mix(in srgb, var(--text) 10%, transparent);
+            --field: color-mix(in srgb, var(--text) 4%, var(--bg));
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
 
         html, body {
-            margin: 0;
-            background: var(--card);
+            background: var(--page);
             color: var(--text);
-            font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+            font-family: -apple-system, "Segoe UI", Roboto, "Inter", sans-serif;
+            -webkit-font-smoothing: antialiased;
         }
 
         body {
             padding:
-                calc(env(safe-area-inset-top, 0px) + var(--tg-safe-area-inset-top, 0px) + 16px)
+                calc(env(safe-area-inset-top, 0px) + var(--tg-safe-area-inset-top, 0px) + 20px)
                 16px
-                calc(env(safe-area-inset-bottom, 0px) + 24px);
+                calc(env(safe-area-inset-bottom, 0px) + 28px);
+            max-width: 480px;
+            margin: 0 auto;
         }
 
-        .card {
-            background: var(--bg);
-            border-radius: 16px;
-            padding: 20px 18px 8px;
-            box-shadow: 0 1px 8px rgba(0,0,0,.04);
+        /* заголовок по центру як шапка додатка */
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+        .header .icon {
+            font-size: 34px;
+            line-height: 1;
+            margin-bottom: 8px;
+        }
+        .header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+        .header p {
+            color: var(--hint);
+            font-size: 13px;
+            margin-top: 4px;
         }
 
-        .tab {
-            display: inline-block;
-            background: var(--accent);
-            color: #fff;
-            font-weight: 600;
-            font-size: 15px;
-            padding: 11px 26px;
-            border-radius: 22px;
-            margin: 0 0 20px;
+        .field {
+            margin-bottom: 14px;
         }
 
-        .field { margin-bottom: 18px; }
-
-        .field label {
+        .field .lbl {
             display: block;
-            color: var(--label);
+            color: var(--hint);
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            margin: 0 0 6px 4px;
+        }
+        .field .lbl .u {
+            color: var(--link);
+            font-weight: 700;
+        }
+
+        input {
+            width: 100%;
+            height: 58px;
+            border: 1.5px solid var(--border);
+            border-radius: 16px;
+            background: var(--field);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            padding: 0 18px;
+            outline: none;
+            transition: border-color .18s, background .18s;
+            letter-spacing: -0.3px;
+        }
+        input::placeholder { color: var(--hint); font-weight: 500; }
+        input:focus {
+            border-color: var(--accent);
+            background: var(--bg);
+        }
+        /* прибираємо стрілки-спіннери */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
+
+        /* поле-результат */
+        .result input {
+            background: color-mix(in srgb, var(--accent) 8%, var(--bg));
+            border-color: color-mix(in srgb, var(--accent) 20%, transparent);
+            color: var(--link);
+        }
+
+        .divider { height: 20px; }
+
+        /* підсумок — акцентна картка */
+        .total {
+            margin-top: 20px;
+            background: var(--accent);
+            border-radius: 20px;
+            padding: 22px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 35%, transparent);
+        }
+        .total .lbl {
+            color: var(--accent-text);
+            opacity: .85;
             font-weight: 600;
             font-size: 12px;
             text-transform: uppercase;
-            letter-spacing: .3px;
-            margin-bottom: 8px;
+            letter-spacing: .8px;
         }
-
-        /* поле = число + фіксована одиниця праворуч */
-        .input-wrap {
-            position: relative;
-            display: flex;
-            align-items: center;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            background: var(--field-bg);
-            height: 52px;
-            padding: 0 14px;
-            transition: border-color .15s;
+        .total .amount {
+            color: var(--accent-text);
+            font-size: 40px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            line-height: 1.1;
         }
-
-        .input-wrap:focus-within { border-color: var(--accent); }
-
-        .input-wrap input {
-            flex: 1;
-            min-width: 0;
-            border: none;
-            outline: none;
-            background: transparent;
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--text);
-            text-align: right;
-            padding: 0 10px 0 0;
-        }
-
-        .input-wrap input::placeholder {
-            color: var(--hint);
-            font-weight: 400;
-        }
-
-        .input-wrap .unit {
-            flex-shrink: 0;
-            color: var(--hint);
-            font-size: 14px;
-            font-weight: 500;
-            white-space: nowrap;
-        }
-
-        .result-field .input-wrap {
-            background: var(--card);
-        }
-        .result-field .input-wrap input { font-weight: 700; }
-
-        .divider {
-            height: 1px;
-            background: var(--border);
-            margin: 2px 0 18px;
-        }
-
-        .total {
-            background: var(--card);
-            border-radius: 14px;
-            padding: 16px 18px;
-            margin-top: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .total .lbl {
-            color: var(--label);
-            font-weight: 700;
-            font-size: 13px;
-            text-transform: uppercase;
-        }
-
-        .total .amount { font-size: 26px; font-weight: 800; }
 
         .hint {
             color: var(--hint);
             font-size: 12px;
             line-height: 1.5;
-            margin: 14px 4px 0;
+            text-align: center;
+            margin-top: 18px;
+            padding: 0 8px;
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <div class="tab">Вартість подорожі</div>
+    <div class="header">
+        <div class="icon">⛽</div>
+        <h1>Вартість подорожі</h1>
+        <p>Розрахунок витрат на паливо</p>
+    </div>
 
-        <div class="field">
-            <label>Відстань</label>
-            <div class="input-wrap">
-                <input type="number" id="distance" inputmode="decimal" placeholder="0">
-                <span class="unit">км</span>
-            </div>
-        </div>
+    <div class="field">
+        <span class="lbl">Відстань, <span class="u">км</span></span>
+        <input type="number" id="distance" inputmode="decimal" placeholder="0">
+    </div>
 
-        <div class="field">
-            <label>Ср. витрата палива</label>
-            <div class="input-wrap">
-                <input type="number" id="consumption" inputmode="decimal" placeholder="0">
-                <span class="unit">л / 100 км</span>
-            </div>
-        </div>
+    <div class="field">
+        <span class="lbl">Ср. витрата палива, <span class="u">л / 100 км</span></span>
+        <input type="number" id="consumption" inputmode="decimal" placeholder="0">
+    </div>
 
-        <div class="field result-field">
-            <label>Необхідна кількість палива</label>
-            <div class="input-wrap">
-                <input type="text" id="liters" readonly placeholder="0">
-                <span class="unit">л</span>
-            </div>
-        </div>
+    <div class="field result">
+        <span class="lbl">Необхідна кількість палива, <span class="u">л</span></span>
+        <input type="text" id="liters" readonly placeholder="0">
+    </div>
 
-        <div class="divider"></div>
+    <div class="divider"></div>
 
-        <div class="field">
-            <label>Вартість палива</label>
-            <div class="input-wrap">
-                <input type="number" id="price" inputmode="decimal" placeholder="0">
-                <span class="unit">за літр</span>
-            </div>
-        </div>
+    <div class="field">
+        <span class="lbl">Ціна палива, <span class="u">за літр</span></span>
+        <input type="number" id="price" inputmode="decimal" placeholder="0">
+    </div>
 
-        <div class="total">
-            <span class="lbl">Загальна вартість</span>
-            <span class="amount" id="totalCost">0.00</span>
-        </div>
+    <div class="total">
+        <span class="lbl">Загальна вартість</span>
+        <span class="amount" id="totalCost">0.00</span>
     </div>
 
     <p class="hint">
-        Поточні місцеві ціни на паливо недоступні для цієї сторінки.
+        Поточні місцеві ціни на паливо недоступні.
         Введіть ціну на паливо вручну.
     </p>
 
@@ -209,13 +203,10 @@
             tg.onEvent('safeAreaChanged', applySafeArea);
         }
 
-        const haptic = () => {
-            try { tg?.HapticFeedback?.selectionChanged(); } catch (e) {}
-        };
+        const haptic = () => { try { tg?.HapticFeedback?.selectionChanged(); } catch (e) {} };
 
         const $ = id => document.getElementById(id);
         const inputs = ['distance', 'consumption', 'price'];
-
         let lastCost = 0;
 
         function calculate(withHaptic = false) {
@@ -231,7 +222,6 @@
 
             if (withHaptic && Math.abs(cost - lastCost) > 0.001) haptic();
             lastCost = cost;
-
             updateMainButton(cost);
         }
 
@@ -258,10 +248,7 @@
             });
         }
 
-        inputs.forEach(id => {
-            $(id).addEventListener('input', () => calculate(true));
-        });
-
+        inputs.forEach(id => $(id).addEventListener('input', () => calculate(true)));
         calculate();
     </script>
 </body>
