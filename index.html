@@ -27,7 +27,6 @@
         }
 
         body {
-            /* поважаємо safe area у fullscreen */
             padding:
                 calc(env(safe-area-inset-top, 0px) + var(--tg-safe-area-inset-top, 0px) + 16px)
                 16px
@@ -64,41 +63,51 @@
             margin-bottom: 8px;
         }
 
-        .row { display: flex; gap: 10px; }
-        .row .value { flex: 1; }
-        .row .unit { flex: 1.1; }
-
-        input, select {
-            width: 100%;
-            height: 52px;
+        /* поле = число + фіксована одиниця праворуч */
+        .input-wrap {
+            position: relative;
+            display: flex;
+            align-items: center;
             border: 1px solid var(--border);
             border-radius: 12px;
             background: var(--field-bg);
-            font-size: 20px;
-            color: var(--text);
+            height: 52px;
             padding: 0 14px;
-            outline: none;
             transition: border-color .15s;
         }
 
-        input { text-align: right; font-weight: 600; }
-        input:focus, select:focus { border-color: var(--accent); }
+        .input-wrap:focus-within { border-color: var(--accent); }
 
-        select {
-            font-size: 15px;
-            font-weight: 500;
+        .input-wrap input {
+            flex: 1;
+            min-width: 0;
+            border: none;
+            outline: none;
+            background: transparent;
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text);
+            text-align: right;
+            padding: 0 10px 0 0;
+        }
+
+        .input-wrap input::placeholder {
             color: var(--hint);
-            appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%238a94a6' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            padding-right: 36px;
+            font-weight: 400;
         }
 
-        .result-field input {
-            background: var(--card);
-            font-weight: 700;
+        .input-wrap .unit {
+            flex-shrink: 0;
+            color: var(--hint);
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
         }
+
+        .result-field .input-wrap {
+            background: var(--card);
+        }
+        .result-field .input-wrap input { font-weight: 700; }
 
         .divider {
             height: 1px;
@@ -139,43 +148,25 @@
 
         <div class="field">
             <label>Відстань</label>
-            <div class="row">
-                <div class="value">
-                    <input type="number" id="distance" inputmode="decimal" value="1200" placeholder="0">
-                </div>
-                <div class="unit">
-                    <select id="distUnit">
-                        <option value="1">кілометр</option>
-                        <option value="1.60934">миля</option>
-                    </select>
-                </div>
+            <div class="input-wrap">
+                <input type="number" id="distance" inputmode="decimal" placeholder="0">
+                <span class="unit">км</span>
             </div>
         </div>
 
         <div class="field">
             <label>Ср. витрата палива</label>
-            <div class="row">
-                <div class="value">
-                    <input type="number" id="consumption" inputmode="decimal" value="5.7" placeholder="0">
-                </div>
-                <div class="unit">
-                    <select id="consUnit">
-                        <option value="per100">літрів / 100 км</option>
-                        <option value="kmpl">км / літр</option>
-                    </select>
-                </div>
+            <div class="input-wrap">
+                <input type="number" id="consumption" inputmode="decimal" placeholder="0">
+                <span class="unit">л / 100 км</span>
             </div>
         </div>
 
         <div class="field result-field">
             <label>Необхідна кількість палива</label>
-            <div class="row">
-                <div class="value">
-                    <input type="text" id="liters" readonly value="0">
-                </div>
-                <div class="unit">
-                    <select disabled><option>літри (L)</option></select>
-                </div>
+            <div class="input-wrap">
+                <input type="text" id="liters" readonly placeholder="0">
+                <span class="unit">л</span>
             </div>
         </div>
 
@@ -183,13 +174,9 @@
 
         <div class="field">
             <label>Вартість палива</label>
-            <div class="row">
-                <div class="value">
-                    <input type="number" id="price" inputmode="decimal" value="1.30" placeholder="0">
-                </div>
-                <div class="unit">
-                    <select disabled><option>/ літри (L)</option></select>
-                </div>
+            <div class="input-wrap">
+                <input type="number" id="price" inputmode="decimal" placeholder="0">
+                <span class="unit">за літр</span>
             </div>
         </div>
 
@@ -207,67 +194,47 @@
     <script>
         const tg = window.Telegram?.WebApp;
 
-        // --- ініціалізація нативного вигляду Telegram ---
         if (tg) {
             tg.ready();
             tg.expand();
-
-            // шапка й фон зливаються з додатком (не виглядає як браузер)
             try { tg.setHeaderColor('secondary_bg_color'); } catch (e) {}
             try { tg.setBackgroundColor('secondary_bg_color'); } catch (e) {}
-
-            // свайпи вниз не закривають додаток під час вводу чисел (Bot API 7.7+)
             try { tg.disableVerticalSwipes(); } catch (e) {}
 
-            // застосовуємо safe area як CSS-змінні (fullscreen на нових клієнтах)
             const applySafeArea = () => {
                 const sa = tg.safeAreaInset || {};
                 document.documentElement.style.setProperty('--tg-safe-area-inset-top', (sa.top || 0) + 'px');
             };
             applySafeArea();
             tg.onEvent('safeAreaChanged', applySafeArea);
-
-            // реагуємо на зміну теми наживо
-            tg.onEvent('themeChanged', () => { /* CSS-змінні оновлюються самі */ });
         }
 
-        const haptic = (type = 'selection') => {
-            if (!tg?.HapticFeedback) return;
-            try {
-                if (type === 'selection') tg.HapticFeedback.selectionChanged();
-                else tg.HapticFeedback.impactOccurred(type);
-            } catch (e) {}
+        const haptic = () => {
+            try { tg?.HapticFeedback?.selectionChanged(); } catch (e) {}
         };
 
         const $ = id => document.getElementById(id);
-        const inputs = ['distance', 'consumption', 'price', 'distUnit', 'consUnit'];
+        const inputs = ['distance', 'consumption', 'price'];
 
         let lastCost = 0;
 
         function calculate(withHaptic = false) {
-            const dist = parseFloat($('distance').value) || 0;
-            const distKm = dist * parseFloat($('distUnit').value); // → км
-
-            const cons = parseFloat($('consumption').value) || 0;
-            const consPer100 = $('consUnit').value === 'kmpl'
-                ? (cons > 0 ? 100 / cons : 0)
-                : cons;
-
+            const distKm = parseFloat($('distance').value) || 0;
+            const consPer100 = parseFloat($('consumption').value) || 0;
             const price = parseFloat($('price').value) || 0;
 
             const liters = distKm * consPer100 / 100;
             const cost = liters * price;
 
-            $('liters').value = liters.toFixed(2);
+            $('liters').value = liters > 0 ? liters.toFixed(2) : '';
             $('totalCost').textContent = cost.toFixed(2);
 
-            if (withHaptic && Math.abs(cost - lastCost) > 0.001) haptic('selection');
+            if (withHaptic && Math.abs(cost - lastCost) > 0.001) haptic();
             lastCost = cost;
 
             updateMainButton(cost);
         }
 
-        // --- нативна кнопка Telegram унизу ---
         function updateMainButton(cost) {
             if (!tg?.MainButton) return;
             if (cost > 0) {
@@ -280,33 +247,22 @@
 
         if (tg?.MainButton) {
             tg.MainButton.onClick(() => {
-                haptic('medium');
-                const dist = $('distance').value;
-                const cons = $('consumption').value;
-                const liters = $('liters').value;
-                const cost = $('totalCost').textContent;
+                try { tg.HapticFeedback?.impactOccurred('medium'); } catch (e) {}
                 const msg =
                     `⛽ Розрахунок палива\n` +
-                    `Відстань: ${dist} км\n` +
-                    `Витрата: ${cons} л/100км\n` +
-                    `Потрібно: ${liters} л\n` +
-                    `Вартість: ${cost}`;
-                // sendData працює лише для запуску з keyboard-кнопки;
-                // для звичайного меню — показуємо нативний попап
-                if (tg.initDataUnsafe?.query_id === undefined) {
-                    try { tg.sendData(msg); } catch (e) { tg.showAlert(msg); }
-                } else {
-                    tg.sendData(msg);
-                }
+                    `Відстань: ${$('distance').value || 0} км\n` +
+                    `Витрата: ${$('consumption').value || 0} л/100км\n` +
+                    `Потрібно: ${$('liters').value || 0} л\n` +
+                    `Вартість: ${$('totalCost').textContent}`;
+                try { tg.sendData(msg); } catch (e) { tg.showAlert(msg); }
             });
         }
 
         inputs.forEach(id => {
             $(id).addEventListener('input', () => calculate(true));
-            $(id).addEventListener('change', () => { haptic('selection'); calculate(true); });
         });
 
-        calculate(); // початковий розрахунок
+        calculate();
     </script>
 </body>
 </html>
