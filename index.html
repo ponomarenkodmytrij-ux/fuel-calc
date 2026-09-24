@@ -230,6 +230,7 @@
             try { tg.setHeaderColor('secondary_bg_color'); } catch (e) {}
             try { tg.setBackgroundColor('secondary_bg_color'); } catch (e) {}
             try { tg.disableVerticalSwipes(); } catch (e) {}
+            try { tg.MainButton.hide(); } catch (e) {}
 
             const applySafeArea = () => {
                 const sa = tg.safeAreaInset || {};
@@ -264,31 +265,6 @@
 
             if (withHaptic && Math.abs(costOne - lastCost) > 0.001) haptic();
             lastCost = costOne;
-            updateMainButton(costOne, costTwo);
-        }
-
-        function updateMainButton(costOne, costTwo) {
-            if (!tg?.MainButton) return;
-            if (costOne > 0) {
-                tg.MainButton.setText('Поділитися розрахунком');
-                tg.MainButton.show();
-            } else {
-                tg.MainButton.hide();
-            }
-        }
-
-        if (tg?.MainButton) {
-            tg.MainButton.onClick(() => {
-                try { tg.HapticFeedback?.impactOccurred('medium'); } catch (e) {}
-                const msg =
-                    `⛽ Розрахунок палива\n` +
-                    `Відстань: ${$('distance').value || 0} км\n` +
-                    `Витрата: ${$('consumption').value || 0} л/100км\n` +
-                    `Ціна: ${$('price').value || 0}\n` +
-                    `\nВ одну сторону: ${$('costOne').textContent} (${$('litersOne').textContent})\n` +
-                    `Туди-назад: ${$('costTwo').textContent} (${$('litersTwo').textContent})`;
-                try { tg.sendData(msg); } catch (e) { tg.showAlert(msg); }
-            });
         }
 
         inputs.forEach(id => $(id).addEventListener('input', () => calculate(true)));
