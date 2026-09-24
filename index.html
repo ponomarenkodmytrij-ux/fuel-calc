@@ -29,138 +29,126 @@
 
         body {
             padding:
-                calc(env(safe-area-inset-top, 0px) + var(--tg-safe-area-inset-top, 0px) + 20px)
-                16px
-                calc(env(safe-area-inset-bottom, 0px) + 28px);
+                calc(env(safe-area-inset-top, 0px) + var(--tg-safe-area-inset-top, 0px) + 12px)
+                14px
+                calc(env(safe-area-inset-bottom, 0px) + 16px);
             max-width: 480px;
             margin: 0 auto;
         }
 
-        /* заголовок по центру як шапка додатка */
+        /* компактний заголовок */
         .header {
             text-align: center;
-            margin-bottom: 24px;
-        }
-        .header .icon {
-            font-size: 34px;
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-        .header h1 {
-            font-size: 22px;
-            font-weight: 800;
-            letter-spacing: -0.3px;
-        }
-        .header p {
-            color: var(--hint);
-            font-size: 13px;
-            margin-top: 4px;
-        }
-
-        .field {
             margin-bottom: 14px;
         }
+        .header .icon { font-size: 26px; line-height: 1; margin-bottom: 4px; }
+        .header h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+        .header p { color: var(--hint); font-size: 12px; margin-top: 2px; }
+
+        .field { margin-bottom: 9px; }
 
         .field .lbl {
             display: block;
             color: var(--hint);
             font-weight: 600;
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: .6px;
-            margin: 0 0 6px 4px;
+            letter-spacing: .5px;
+            margin: 0 0 4px 4px;
         }
-        .field .lbl .u {
-            color: var(--link);
-            font-weight: 700;
-        }
+        .field .lbl .u { color: var(--link); font-weight: 700; }
 
         input {
             width: 100%;
-            height: 58px;
+            height: 46px;
             border: 1.5px solid var(--border);
-            border-radius: 16px;
+            border-radius: 12px;
             background: var(--field);
-            font-size: 24px;
+            font-size: 19px;
             font-weight: 700;
             color: var(--text);
-            padding: 0 18px;
+            padding: 0 14px;
             outline: none;
             transition: border-color .18s, background .18s;
             letter-spacing: -0.3px;
         }
         input::placeholder { color: var(--hint); font-weight: 500; }
-        input:focus {
-            border-color: var(--accent);
-            background: var(--bg);
-        }
-        /* прибираємо стрілки-спіннери */
+        input:focus { border-color: var(--accent); background: var(--bg); }
         input[type=number]::-webkit-inner-spin-button,
         input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
 
-        /* поле-результат */
         .result input {
             background: color-mix(in srgb, var(--accent) 8%, var(--bg));
             border-color: color-mix(in srgb, var(--accent) 20%, transparent);
             color: var(--link);
         }
 
-        .divider { height: 20px; }
+        .divider { height: 8px; }
 
-        /* підсумок — акцентна картка */
+        /* два результати поруч */
+        .totals {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
         .total {
-            margin-top: 20px;
-            background: var(--accent);
-            border-radius: 20px;
-            padding: 22px 24px;
+            border-radius: 16px;
+            padding: 14px 12px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 4px;
-            box-shadow: 0 8px 24px color-mix(in srgb, var(--accent) 35%, transparent);
+            gap: 3px;
+            text-align: center;
         }
-        .total .lbl {
-            color: var(--accent-text);
-            opacity: .85;
+        .total.one {
+            background: var(--field);
+            border: 1.5px solid var(--border);
+        }
+        .total.two {
+            background: var(--accent);
+            box-shadow: 0 6px 18px color-mix(in srgb, var(--accent) 30%, transparent);
+        }
+        .total .cap {
             font-weight: 600;
-            font-size: 12px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: .8px;
+            letter-spacing: .5px;
         }
+        .total.one .cap { color: var(--hint); }
+        .total.two .cap { color: var(--accent-text); opacity: .9; }
+
         .total .amount {
-            color: var(--accent-text);
-            font-size: 40px;
+            font-size: 26px;
             font-weight: 800;
-            letter-spacing: -1px;
-            line-height: 1.1;
+            letter-spacing: -0.8px;
+            line-height: 1.05;
         }
+        .total.one .amount { color: var(--text); }
+        .total.two .amount { color: var(--accent-text); }
+
+        .total .sub {
+            font-size: 10px;
+            font-weight: 500;
+        }
+        .total.one .sub { color: var(--hint); }
+        .total.two .sub { color: var(--accent-text); opacity: .8; }
 
         .hint {
             color: var(--hint);
-            font-size: 12px;
-            line-height: 1.5;
+            font-size: 11px;
+            line-height: 1.4;
             text-align: center;
-            margin-top: 18px;
+            margin-top: 12px;
             padding: 0 8px;
         }
 
-        /* простір знизу, щоб останнє поле піднімалось над клавіатурою */
-        .keyboard-spacer {
-            height: 0;
-            transition: height .2s ease;
-        }
+        .keyboard-spacer { height: 0; transition: height .2s ease; }
 
-        /* панель навігації над клавіатурою (Далі / Готово) */
         .kb-nav {
-            position: fixed;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: none;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
+            position: fixed; left: 0; right: 0; bottom: 0;
+            display: none; justify-content: space-between; align-items: center; gap: 8px;
             padding: 8px 12px calc(env(safe-area-inset-bottom, 0px) + 8px);
             background: var(--page);
             border-top: 1px solid var(--border);
@@ -169,20 +157,14 @@
         .kb-nav.show { display: flex; }
         .kb-nav .arrows { display: flex; gap: 8px; }
         .kb-nav button {
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
+            border: none; border-radius: 10px;
+            font-size: 16px; font-weight: 600;
             padding: 10px 18px;
-            background: var(--field);
-            color: var(--text);
+            background: var(--field); color: var(--text);
             cursor: pointer;
         }
         .kb-nav button:disabled { opacity: .35; }
-        .kb-nav .done {
-            background: var(--accent);
-            color: var(--accent-text);
-        }
+        .kb-nav .done { background: var(--accent); color: var(--accent-text); }
     </style>
 </head>
 <body>
@@ -207,21 +189,28 @@
         <input type="text" id="liters" readonly placeholder="0">
     </div>
 
-    <div class="divider"></div>
-
     <div class="field">
         <span class="lbl">Ціна палива, <span class="u">за літр</span></span>
         <input type="number" id="price" inputmode="decimal" placeholder="0">
     </div>
 
-    <div class="total">
-        <span class="lbl">Загальна вартість</span>
-        <span class="amount" id="totalCost">0.00</span>
+    <div class="divider"></div>
+
+    <div class="totals">
+        <div class="total one">
+            <span class="cap">В одну сторону</span>
+            <span class="amount" id="costOne">0.00</span>
+            <span class="sub" id="litersOne">0 л</span>
+        </div>
+        <div class="total two">
+            <span class="cap">Туди-назад</span>
+            <span class="amount" id="costTwo">0.00</span>
+            <span class="sub" id="litersTwo">0 л</span>
+        </div>
     </div>
 
     <p class="hint">
-        Поточні місцеві ціни на паливо недоступні.
-        Введіть ціну на паливо вручну.
+        Поточні ціни на паливо недоступні. Введіть ціну вручну.
     </p>
 
     <div class="keyboard-spacer" id="kbSpacer"></div>
@@ -263,21 +252,29 @@
             const consPer100 = parseFloat($('consumption').value) || 0;
             const price = parseFloat($('price').value) || 0;
 
-            const liters = distKm * consPer100 / 100;
-            const cost = liters * price;
+            // в одну сторону
+            const litersOne = distKm * consPer100 / 100;
+            const costOne = litersOne * price;
+            // туди-назад (×2)
+            const litersTwo = litersOne * 2;
+            const costTwo = costOne * 2;
 
-            $('liters').value = liters > 0 ? liters.toFixed(2) : '';
-            $('totalCost').textContent = cost.toFixed(2);
+            $('liters').value = litersOne > 0 ? litersOne.toFixed(2) : '';
 
-            if (withHaptic && Math.abs(cost - lastCost) > 0.001) haptic();
-            lastCost = cost;
-            updateMainButton(cost);
+            $('costOne').textContent = costOne.toFixed(2);
+            $('litersOne').textContent = litersOne.toFixed(1) + ' л';
+            $('costTwo').textContent = costTwo.toFixed(2);
+            $('litersTwo').textContent = litersTwo.toFixed(1) + ' л';
+
+            if (withHaptic && Math.abs(costOne - lastCost) > 0.001) haptic();
+            lastCost = costOne;
+            updateMainButton(costOne, costTwo);
         }
 
-        function updateMainButton(cost) {
+        function updateMainButton(costOne, costTwo) {
             if (!tg?.MainButton) return;
-            if (cost > 0) {
-                tg.MainButton.setText('Поділитися: ' + cost.toFixed(2));
+            if (costOne > 0) {
+                tg.MainButton.setText('Поділитися розрахунком');
                 tg.MainButton.show();
             } else {
                 tg.MainButton.hide();
@@ -291,8 +288,9 @@
                     `⛽ Розрахунок палива\n` +
                     `Відстань: ${$('distance').value || 0} км\n` +
                     `Витрата: ${$('consumption').value || 0} л/100км\n` +
-                    `Потрібно: ${$('liters').value || 0} л\n` +
-                    `Вартість: ${$('totalCost').textContent}`;
+                    `Ціна: ${$('price').value || 0}\n` +
+                    `\nВ одну сторону: ${$('costOne').textContent} (${$('litersOne').textContent})\n` +
+                    `Туди-назад: ${$('costTwo').textContent} (${$('litersTwo').textContent})`;
                 try { tg.sendData(msg); } catch (e) { tg.showAlert(msg); }
             });
         }
@@ -300,7 +298,6 @@
         inputs.forEach(id => $(id).addEventListener('input', () => calculate(true)));
 
         // --- керування клавіатурою на мобільному ---
-        // редаговані поля по порядку (liters — readonly, пропускаємо)
         const editable = ['distance', 'consumption', 'price'];
         const kbNav = $('kbNav');
         const kbSpacer = $('kbSpacer');
@@ -309,25 +306,17 @@
         let currentIdx = -1;
 
         function scrollToActive(el) {
-            // даємо клавіатурі з'явитись, потім піднімаємо поле у видиму зону
-            setTimeout(() => {
-                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }, 250);
+            setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'center' }), 250);
         }
-
         function updateNavState() {
             navPrev.disabled = currentIdx <= 0;
             navNext.disabled = currentIdx >= editable.length - 1;
         }
-
         function focusField(idx) {
             if (idx < 0 || idx >= editable.length) return;
             const el = $(editable[idx]);
             el.focus();
-            // курсор у кінець
-            const v = el.value;
-            el.value = '';
-            el.value = v;
+            const v = el.value; el.value = ''; el.value = v;
         }
 
         editable.forEach((id, idx) => {
@@ -335,12 +324,11 @@
             el.addEventListener('focus', () => {
                 currentIdx = idx;
                 kbNav.classList.add('show');
-                kbSpacer.style.height = '320px'; // місце під клавіатуру
+                kbSpacer.style.height = '300px';
                 updateNavState();
                 scrollToActive(el);
             });
             el.addEventListener('blur', () => {
-                // ховаємо панель лише якщо фокус пішов не на іншу нашу кнопку/поле
                 setTimeout(() => {
                     const a = document.activeElement;
                     const stillEditing = editable.some(eid => $(eid) === a);
@@ -352,15 +340,9 @@
             });
         });
 
-        navPrev.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (currentIdx > 0) focusField(currentIdx - 1);
-        });
-        navNext.addEventListener('click', (e) => {
-            e.preventDefault();
-            if (currentIdx < editable.length - 1) focusField(currentIdx + 1);
-        });
-        $('navDone').addEventListener('click', (e) => {
+        navPrev.addEventListener('click', e => { e.preventDefault(); if (currentIdx > 0) focusField(currentIdx - 1); });
+        navNext.addEventListener('click', e => { e.preventDefault(); if (currentIdx < editable.length - 1) focusField(currentIdx + 1); });
+        $('navDone').addEventListener('click', e => {
             e.preventDefault();
             $(editable[currentIdx])?.blur();
             kbNav.classList.remove('show');
