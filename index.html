@@ -39,10 +39,18 @@
         /* компактний заголовок */
         .header {
             text-align: center;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
         }
-        .header .icon { font-size: 26px; line-height: 1; margin-bottom: 4px; }
-        .header h1 { font-size: 18px; font-weight: 800; letter-spacing: -0.3px; }
+        .header h1 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 7px;
+        }
+        .header h1 .icon { font-size: 20px; line-height: 1; }
         .header p { color: var(--hint); font-size: 12px; margin-top: 2px; }
 
         .field { margin-bottom: 9px; }
@@ -169,8 +177,7 @@
 </head>
 <body>
     <div class="header">
-        <div class="icon">⛽</div>
-        <h1>Вартість подорожі</h1>
+        <h1><span class="icon">⛽</span> Вартість подорожі</h1>
         <p>Розрахунок витрат на паливо</p>
     </div>
 
@@ -182,11 +189,6 @@
     <div class="field">
         <span class="lbl">Ср. витрата палива, <span class="u">л / 100 км</span></span>
         <input type="number" id="consumption" inputmode="decimal" placeholder="0">
-    </div>
-
-    <div class="field result">
-        <span class="lbl">Необхідна кількість палива, <span class="u">л</span></span>
-        <input type="text" id="liters" readonly placeholder="0">
     </div>
 
     <div class="field">
@@ -208,10 +210,6 @@
             <span class="sub" id="litersTwo">0 л</span>
         </div>
     </div>
-
-    <p class="hint">
-        Поточні ціни на паливо недоступні. Введіть ціну вручну.
-    </p>
 
     <div class="keyboard-spacer" id="kbSpacer"></div>
 
@@ -258,8 +256,6 @@
             // туди-назад (×2)
             const litersTwo = litersOne * 2;
             const costTwo = costOne * 2;
-
-            $('liters').value = litersOne > 0 ? litersOne.toFixed(2) : '';
 
             $('costOne').textContent = costOne.toFixed(2);
             $('litersOne').textContent = litersOne.toFixed(1) + ' л';
