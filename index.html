@@ -144,6 +144,45 @@
             margin-top: 18px;
             padding: 0 8px;
         }
+
+        /* простір знизу, щоб останнє поле піднімалось над клавіатурою */
+        .keyboard-spacer {
+            height: 0;
+            transition: height .2s ease;
+        }
+
+        /* панель навігації над клавіатурою (Далі / Готово) */
+        .kb-nav {
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px calc(env(safe-area-inset-bottom, 0px) + 8px);
+            background: var(--page);
+            border-top: 1px solid var(--border);
+            z-index: 100;
+        }
+        .kb-nav.show { display: flex; }
+        .kb-nav .arrows { display: flex; gap: 8px; }
+        .kb-nav button {
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            padding: 10px 18px;
+            background: var(--field);
+            color: var(--text);
+            cursor: pointer;
+        }
+        .kb-nav button:disabled { opacity: .35; }
+        .kb-nav .done {
+            background: var(--accent);
+            color: var(--accent-text);
+        }
     </style>
 </head>
 <body>
@@ -184,6 +223,16 @@
         Поточні місцеві ціни на паливо недоступні.
         Введіть ціну на паливо вручну.
     </p>
+
+    <div class="keyboard-spacer" id="kbSpacer"></div>
+
+    <div class="kb-nav" id="kbNav">
+        <div class="arrows">
+            <button type="button" id="navPrev">↑</button>
+            <button type="button" id="navNext">↓</button>
+        </div>
+        <button type="button" class="done" id="navDone">Готово</button>
+    </div>
 
     <script>
         const tg = window.Telegram?.WebApp;
@@ -249,6 +298,75 @@
         }
 
         inputs.forEach(id => $(id).addEventListener('input', () => calculate(true)));
+
+        // --- керування клавіатурою на мобільному ---
+        // редаговані поля по порядку (liters — readonly, пропускаємо)
+        const editable = ['distance', 'consumption', 'price'];
+        const kbNav = $('kbNav');
+        const kbSpacer = $('kbSpacer');
+        const navPrev = $('navPrev');
+        const navNext = $('navNext');
+        let currentIdx = -1;
+
+        function scrollToActive(el) {
+            // даємо клавіатурі з'явитись, потім піднімаємо поле у видиму зону
+            setTimeout(() => {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 250);
+        }
+
+        function updateNavState() {
+            navPrev.disabled = currentIdx <= 0;
+            navNext.disabled = currentIdx >= editable.length - 1;
+        }
+
+        function focusField(idx) {
+            if (idx < 0 || idx >= editable.length) return;
+            const el = $(editable[idx]);
+            el.focus();
+            // курсор у кінець
+            const v = el.value;
+            el.value = '';
+            el.value = v;
+        }
+
+        editable.forEach((id, idx) => {
+            const el = $(id);
+            el.addEventListener('focus', () => {
+                currentIdx = idx;
+                kbNav.classList.add('show');
+                kbSpacer.style.height = '320px'; // місце під клавіатуру
+                updateNavState();
+                scrollToActive(el);
+            });
+            el.addEventListener('blur', () => {
+                // ховаємо панель лише якщо фокус пішов не на іншу нашу кнопку/поле
+                setTimeout(() => {
+                    const a = document.activeElement;
+                    const stillEditing = editable.some(eid => $(eid) === a);
+                    if (!stillEditing) {
+                        kbNav.classList.remove('show');
+                        kbSpacer.style.height = '0';
+                    }
+                }, 100);
+            });
+        });
+
+        navPrev.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentIdx > 0) focusField(currentIdx - 1);
+        });
+        navNext.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (currentIdx < editable.length - 1) focusField(currentIdx + 1);
+        });
+        $('navDone').addEventListener('click', (e) => {
+            e.preventDefault();
+            $(editable[currentIdx])?.blur();
+            kbNav.classList.remove('show');
+            kbSpacer.style.height = '0';
+        });
+
         calculate();
     </script>
 </body>
